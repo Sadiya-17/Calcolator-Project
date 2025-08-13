@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simple Dark Theme Calculator</title>
+    <style>
+        /* General body styling for dark theme and centering */
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #212529; /* Dark background color */
+            flex-direction: column;
+        }
+
+        /* Calculator container styling */
+        .calculator {
+            background-color: #212529; /* Same as body for a seamless look */
+            width: 350px;
+            padding: 20px;
+            border-radius: 20px;
+            box-shadow: 10px 10px 20px rgba(0, 0, 0, 0.5), -10px -10px 20px rgba(45, 45, 45, 0.2);
+        }
+
+        /* Display screen styling */
+        #display {
+            width: 100%;
+            height: 80px;
+            background-color: #212529;
+            color: #f8f9fa; /* Light text color */
+            border: none;
+            text-align: right;
+            padding: 10px;
+            font-size: 3em;
+            box-sizing: border-box;
+            border-radius: 10px;
+            margin-bottom: 20px;
+        }
+
+        /* Buttons grid layout */
+        .buttons {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 15px;
+        }
+
+        /* General button styling for neomorphic effect */
+        .buttons button {
+            padding: 20px;
+            font-size: 1.5em;
+            border: none;
+            cursor: pointer;
+            border-radius: 15px;
+            background-color: #212529;
+            color: #f8f9fa; /* Light text color */
+            box-shadow: 8px 8px 16px rgba(0, 0, 0, 0.5), -8px -8px 16px rgba(45, 45, 45, 0.2);
+            transition: all 0.2s ease-in-out;
+        }
+
+        /* Button pressed state (inset shadow) */
+        .buttons button:active {
+            box-shadow: inset 5px 5px 10px rgba(0, 0, 0, 0.5), inset -5px -5px 10px rgba(45, 45, 45, 0.2);
+        }
+
+        /* Styling for special "clear" and "delete" buttons */
+        .buttons .special {
+            color: #4CAF50; /* Green color for AC, DE, % */
+        }
+
+        /* Styling for equals button (orange color) */
+        .buttons .equals {
+            background-color: #f79234; /* Orange background */
+            color: white;
+            grid-row: span 2;
+        }
+
+        /* Styling for number buttons */
+        .buttons .number {
+            color: #f8f9fa; /* Light grey color */
+        }
+
+        .credit {
+            margin-top: 20px;
+            font-size: 0.9em;
+            color: #ccc;
+            text-align: center;
+        }
+
+    </style>
+</head>
+<body>
+    <div class="calculator">
+        <input type="text" id="display" disabled value="0">
+        <div class="buttons">
+            <button class="special" id="clearAll">AC</button>
+            <button class="special" id="delete">DE</button>
+            <button class="special operator">%</button>
+            <button class="operator">/</button>
+
+            <button class="number">7</button>
+            <button class="number">8</button>
+            <button class="number">9</button>
+            <button class="operator">*</button>
+
+            <button class="number">4</button>
+            <button class="number">5</button>
+            <button class="number">6</button>
+            <button class="operator">-</button>
+
+            <button class="number">1</button>
+            <button class="number">2</button>
+            <button class="number">3</button>
+            <button class="equals">=</button>
+
+            <button class="number">00</button>
+            <button class="number">0</button>
+            <button class="number">.</button>
+        </div>
+    </div>
+    <p class="credit">created by Sadiya Hossain</p>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const display = document.getElementById('display');
+            const buttons = document.querySelectorAll('.buttons button');
+            
+            let currentInput = '';
+            let isResultDisplayed = false;
+
+            buttons.forEach(button => {
+                button.addEventListener('click', () => {
+                    const buttonText = button.textContent;
+
+                    if (button.id === 'clearAll') {
+                        currentInput = '';
+                        isResultDisplayed = false;
+                        display.value = '0';
+                    } else if (button.id === 'delete') {
+                        currentInput = currentInput.slice(0, -1);
+                        if (currentInput === '') {
+                            display.value = '0';
+                        } else {
+                            display.value = currentInput;
+                        }
+                    } else if (buttonText === '=') {
+                        try {
+                            // Using eval for this simple case. For real-world apps, a safer parser is recommended.
+                            let result = eval(currentInput.replace('%', '/100'));
+                            display.value = result;
+                            currentInput = result.toString();
+                            isResultDisplayed = true;
+                        } catch (error) {
+                            display.value = 'Error';
+                            currentInput = '';
+                        }
+                    } else {
+                        // If a result is displayed and the next input is a number, start a new calculation
+                        if (isResultDisplayed && !['+', '-', '*', '/', '%'].includes(buttonText)) {
+                            currentInput = buttonText;
+                            display.value = currentInput;
+                            isResultDisplayed = false;
+                        } else {
+                            if (display.value === '0' && !['+', '-', '*', '/', '%', '.'].includes(buttonText)) {
+                                currentInput = buttonText;
+                                display.value = currentInput;
+                            } else {
+                                currentInput += buttonText;
+                                display.value = currentInput;
+                            }
+                            isResultDisplayed = false;
+                        }
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html>
